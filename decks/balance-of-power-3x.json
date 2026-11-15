@@ -1,0 +1,58 @@
+{
+  "name": "Balance of Power (3x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 14,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "wild": ["D", "S"],
+  "kinds": [
+    {"name": "Tissaphernes", "family": "Antiquity", "color": "#a0522d", "glyph": "column"},
+    {"name": "Hiero II", "family": "Antiquity", "color": "#b8732e", "glyph": "column"},
+    {"name": "Su Qin", "family": "Antiquity", "color": "#8a5a2b", "glyph": "column"},
+    {"name": "Kautilya", "family": "Antiquity", "color": "#c08a3e", "glyph": "column"},
+    {"name": "Cosimo de' Medici", "family": "Renaissance", "color": "#b3262e", "glyph": "palle"},
+    {"name": "Lorenzo de' Medici", "family": "Renaissance", "color": "#d1403a", "glyph": "palle"},
+    {"name": "Francesco Sforza", "family": "Renaissance", "color": "#9a1f4a", "glyph": "palle"},
+    {"name": "Cardinal Wolsey", "family": "Renaissance", "color": "#c2185b", "glyph": "palle"},
+    {"name": "Richelieu", "family": "Grand Alliance", "color": "#6a3d9a", "glyph": "crown"},
+    {"name": "William III", "family": "Grand Alliance", "color": "#8e5cc4", "glyph": "crown"},
+    {"name": "Kaunitz", "family": "Grand Alliance", "color": "#5b4bb0", "glyph": "crown"},
+    {"name": "Pitt the Younger", "family": "Grand Alliance", "color": "#7b3f8c", "glyph": "crown"},
+    {"name": "Metternich", "family": "Concert of Europe", "color": "#1f5f9e", "glyph": "quill"},
+    {"name": "Castlereagh", "family": "Concert of Europe", "color": "#3b7fc4", "glyph": "quill"},
+    {"name": "Talleyrand", "family": "Concert of Europe", "color": "#2a6f97", "glyph": "quill"},
+    {"name": "Bismarck", "family": "Concert of Europe", "color": "#33508a", "glyph": "quill"},
+    {"name": "Chulalongkorn", "family": "Between Empires", "color": "#2e7d4f", "glyph": "scales"},
+    {"name": "Abdur Rahman Khan", "family": "Between Empires", "color": "#3f9a5a", "glyph": "scales"},
+    {"name": "Menelik II", "family": "Between Empires", "color": "#5a8a2e", "glyph": "scales"},
+    {"name": "İsmet İnönü", "family": "Between Empires", "color": "#2a8a80", "glyph": "scales"}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 3},
+      {"value": 55, "need": 1, "damage": 10, "count": 1},
+      {"value": 80, "need": 2, "damage": 8, "count": 2},
+      {"value": 90, "need": 3, "damage": 9, "count": 1}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 2},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 2},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 1}
+    ]
+  }
+}

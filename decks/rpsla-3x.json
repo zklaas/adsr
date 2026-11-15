@@ -1,0 +1,60 @@
+{
+  "name": "Rock Paper Scissors Lizard Alien (3x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 14,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "beat_bonus": 15,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "beats": {
+    "Rock":     {"Scissors": "blunts", "Lizard": "crushes"},
+    "Paper":    {"Rock": "covers", "Alien": "smothers"},
+    "Scissors": {"Paper": "cut", "Lizard": "snip"},
+    "Lizard":   {"Paper": "eats", "Alien": "devours"},
+    "Alien":    {"Scissors": "corrodes", "Rock": "dissolves"}
+  },
+  "kinds": [
+    {"name": "Granite", "family": "Rock", "color": "#7a7d86", "glyph": "rock"},
+    {"name": "Obsidian", "family": "Rock", "color": "#3e3b4a", "glyph": "rock"},
+    {"name": "Basalt", "family": "Rock", "color": "#5b6a72", "glyph": "rock"},
+    {"name": "Parchment", "family": "Paper", "color": "#b8893a", "glyph": "paper"},
+    {"name": "Papyrus", "family": "Paper", "color": "#94782c", "glyph": "paper"},
+    {"name": "Vellum", "family": "Paper", "color": "#c0784a", "glyph": "paper"},
+    {"name": "Shears", "family": "Scissors", "color": "#4a7fb0", "glyph": "scissors"},
+    {"name": "Scalpel", "family": "Scissors", "color": "#3f9bb3", "glyph": "scissors"},
+    {"name": "Cleaver", "family": "Scissors", "color": "#34557a", "glyph": "scissors"},
+    {"name": "Gecko", "family": "Lizard", "color": "#5a9e3a", "glyph": "lizard"},
+    {"name": "Iguana", "family": "Lizard", "color": "#2f8a5e", "glyph": "lizard"},
+    {"name": "Chameleon", "family": "Lizard", "color": "#86a226", "glyph": "lizard"},
+    {"name": "Spore Drifter", "family": "Alien", "color": "#9b59b6", "glyph": "alien"},
+    {"name": "Crystal Mite", "family": "Alien", "color": "#c0449a", "glyph": "alien"},
+    {"name": "Methane Floater", "family": "Alien", "color": "#6c4fc4", "glyph": "alien"}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 3},
+      {"value": 55, "need": 1, "damage": 10, "count": 1},
+      {"value": 80, "need": 2, "damage": 8, "count": 2},
+      {"value": 90, "need": 3, "damage": 9, "count": 1}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 1},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 3},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 1}
+    ]
+  }
+}

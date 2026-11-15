@@ -1,0 +1,55 @@
+{
+  "name": "Captains (1x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 16,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "kinds": [
+    {"name": "Sea Captain", "family": "Mariners", "color": "#1f5f9e", "glyph": "anchor"},
+    {"name": "Naval Captain", "family": "Mariners", "color": "#3b7fc4", "glyph": "anchor"},
+    {"name": "Pirate Captain", "family": "Mariners", "color": "#2a6f97", "glyph": "anchor"},
+    {"name": "Riverboat Captain", "family": "Mariners", "color": "#33508a", "glyph": "anchor"},
+    {"name": "Army Captain", "family": "Soldiers", "color": "#b3262e", "glyph": "bars"},
+    {"name": "Cavalry Captain", "family": "Soldiers", "color": "#d1403a", "glyph": "bars"},
+    {"name": "Captain of the Guard", "family": "Soldiers", "color": "#9a1f4a", "glyph": "bars"},
+    {"name": "Militia Captain", "family": "Soldiers", "color": "#c2185b", "glyph": "bars"},
+    {"name": "Airline Captain", "family": "Aviators", "color": "#2e7d4f", "glyph": "wings"},
+    {"name": "Group Captain", "family": "Aviators", "color": "#3f9a5a", "glyph": "wings"},
+    {"name": "Airship Captain", "family": "Aviators", "color": "#5a8a2e", "glyph": "wings"},
+    {"name": "Starship Captain", "family": "Aviators", "color": "#2a8a80", "glyph": "wings"},
+    {"name": "Hockey Captain", "family": "Team Captains", "color": "#b8732e", "glyph": "armband"},
+    {"name": "Football Captain", "family": "Team Captains", "color": "#a0522d", "glyph": "armband"},
+    {"name": "Cricket Captain", "family": "Team Captains", "color": "#c08a3e", "glyph": "armband"},
+    {"name": "Rugby Captain", "family": "Team Captains", "color": "#8a5a2b", "glyph": "armband"},
+    {"name": "Fire Captain", "family": "Civic Captains", "color": "#6a3d9a", "glyph": "badge"},
+    {"name": "Police Captain", "family": "Civic Captains", "color": "#8e5cc4", "glyph": "badge"},
+    {"name": "Port Captain", "family": "Civic Captains", "color": "#5b4a9e", "glyph": "badge"},
+    {"name": "Captain of Industry", "family": "Civic Captains", "color": "#7a3d7a", "glyph": "badge"}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 4},
+      {"value": 55, "need": 1, "damage": 10, "count": 2}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 5},
+      {"value": 60, "need": 1, "count": 3}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 3},
+      {"value": 60, "need": 1, "count": 2}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 2}
+    ]
+  }
+}

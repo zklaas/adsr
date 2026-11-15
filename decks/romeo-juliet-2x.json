@@ -1,0 +1,64 @@
+{
+  "name": "Romeo and Juliet (2x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 16,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "kinds": [
+    {"name": "Romeo", "family": "Montagues", "color": "#1f5f9e", "glyph": "rapier"},
+    {"name": "Lord Montague", "family": "Montagues", "color": "#3b7fc4", "glyph": "rapier"},
+    {"name": "Lady Montague", "family": "Montagues", "color": "#2a6f97", "glyph": "rapier"},
+    {"name": "Benvolio", "family": "Montagues", "color": "#33508a", "glyph": "rapier"},
+    {"name": "Juliet", "family": "Capulets", "color": "#b3262e", "glyph": "balcony"},
+    {"name": "Lord Capulet", "family": "Capulets", "color": "#d1403a", "glyph": "balcony"},
+    {"name": "Lady Capulet", "family": "Capulets", "color": "#9a1f4a", "glyph": "balcony"},
+    {"name": "Tybalt", "family": "Capulets", "color": "#c2185b", "glyph": "balcony"},
+    {"name": "Prince Escalus", "family": "Citizens of Verona", "color": "#2e7d4f", "glyph": "tower"},
+    {"name": "Mercutio", "family": "Citizens of Verona", "color": "#3f9a5a", "glyph": "tower"},
+    {"name": "Count Paris", "family": "Citizens of Verona", "color": "#5a8a2e", "glyph": "tower"},
+    {"name": "First Watchman", "family": "Citizens of Verona", "color": "#2a8a80", "glyph": "tower"},
+    {"name": "Nurse", "family": "Servants", "color": "#b8732e", "glyph": "ewer"},
+    {"name": "Peter", "family": "Servants", "color": "#a0522d", "glyph": "ewer"},
+    {"name": "Sampson", "family": "Servants", "color": "#c08a3e", "glyph": "ewer"},
+    {"name": "Balthasar", "family": "Servants", "color": "#8a5a2b", "glyph": "ewer"},
+    {"name": "Friar Laurence", "family": "Church Figures", "color": "#6a3d9a", "glyph": "chapel", "cards": {
+      "A": [{"value": 70, "need": 1, "damage": 6, "count": 6}, {"value": 55, "need": 1, "damage": 10, "count": 2}, {"value": 80, "need": 2, "damage": 8, "count": 4}],
+      "S": [{"value": 40, "need": 1, "count": 4}, {"value": 60, "need": 1, "count": 2}],
+      "D": [{"value": 40, "need": 1, "count": 6}, {"value": 60, "need": 1, "count": 4}],
+      "R": [{"value": 55, "need": 1, "count": 4}]
+    }},
+    {"name": "Friar John", "family": "Church Figures", "color": "#8e5cc4", "glyph": "chapel", "cards": {
+      "A": [{"value": 70, "need": 1, "damage": 6, "count": 6}, {"value": 55, "need": 1, "damage": 10, "count": 2}, {"value": 80, "need": 2, "damage": 8, "count": 4}],
+      "S": [{"value": 40, "need": 1, "count": 4}, {"value": 60, "need": 1, "count": 2}],
+      "D": [{"value": 40, "need": 1, "count": 6}, {"value": 60, "need": 1, "count": 4}],
+      "R": [{"value": 55, "need": 1, "count": 4}]
+    }}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 3},
+      {"value": 55, "need": 1, "damage": 10, "count": 1},
+      {"value": 80, "need": 2, "damage": 8, "count": 2}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 2},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 3},
+      {"value": 60, "need": 1, "count": 2}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 2}
+    ]
+  }
+}

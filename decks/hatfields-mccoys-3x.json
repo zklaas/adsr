@@ -1,0 +1,60 @@
+{
+  "name": "Hatfields and McCoys (3x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 14,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "head_damage": 3,
+    "head_bonus": 2,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "heads": {"Hatfield": "Devil Anse", "McCoy": "Ole Ran'l"},
+  "kinds": [
+    {"name": "Devil Anse", "family": "Hatfield", "color": "#841f1f", "glyph": "hatfield"},
+    {"name": "Levicy", "family": "Hatfield", "color": "#a03d35", "glyph": "hatfield"},
+    {"name": "Johnse", "family": "Hatfield", "color": "#c75441", "glyph": "hatfield"},
+    {"name": "Cap", "family": "Hatfield", "color": "#84341f", "glyph": "hatfield"},
+    {"name": "Ellison", "family": "Hatfield", "color": "#a05335", "glyph": "hatfield"},
+    {"name": "Wall", "family": "Hatfield", "color": "#c77041", "glyph": "hatfield"},
+    {"name": "Elias", "family": "Hatfield", "color": "#84491f", "glyph": "hatfield"},
+    {"name": "Tennis", "family": "Hatfield", "color": "#a06a35", "glyph": "hatfield"},
+    {"name": "Preacher Anse", "family": "Hatfield", "color": "#c78d41", "glyph": "hatfield"},
+    {"name": "Floyd", "family": "Hatfield", "color": "#845f1f", "glyph": "hatfield"},
+    {"name": "Ole Ran'l", "family": "McCoy", "color": "#1f6a84", "glyph": "mccoy"},
+    {"name": "Sarah", "family": "McCoy", "color": "#357ba0", "glyph": "mccoy"},
+    {"name": "Roseanna", "family": "McCoy", "color": "#418dc7", "glyph": "mccoy"},
+    {"name": "Nancy", "family": "McCoy", "color": "#1f4e84", "glyph": "mccoy"},
+    {"name": "Tolbert", "family": "McCoy", "color": "#355ea0", "glyph": "mccoy"},
+    {"name": "Pharmer", "family": "McCoy", "color": "#4167c7", "glyph": "mccoy"},
+    {"name": "Bud", "family": "McCoy", "color": "#1f3284", "glyph": "mccoy"},
+    {"name": "Alifair", "family": "McCoy", "color": "#3540a0", "glyph": "mccoy"},
+    {"name": "Calvin", "family": "McCoy", "color": "#4142c7", "glyph": "mccoy"},
+    {"name": "Asa Harmon", "family": "McCoy", "color": "#271f84", "glyph": "mccoy"}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 3},
+      {"value": 55, "need": 1, "damage": 10, "count": 1},
+      {"value": 80, "need": 2, "damage": 8, "count": 2},
+      {"value": 90, "need": 3, "damage": 9, "count": 1}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 1},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 3},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 1}
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "Sound waves (3x)",
+  "rules": {
+    "start_hp": 100,
+    "hand_size": 14,
+    "max_discard": 2,
+    "draw_limit": 1,
+    "swap_limit": 2,
+    "shift_divisor": 4,
+    "min_percent": 5,
+    "max_percent": 95,
+    "share_divisor": 3,
+    "max_turns": 400,
+    "max_players": 6
+  },
+  "kinds": [
+    {"name": "Sine", "family": "Smooth", "color": "#3b7fc4", "glyph": "sine"},
+    {"name": "Triangle", "family": "Smooth", "color": "#2a9d8f", "glyph": "triangle"},
+    {"name": "Cosine", "family": "Smooth", "color": "#5b6ee1", "glyph": "cosine"},
+    {"name": "Square", "family": "Edged", "color": "#c4473f", "glyph": "square"},
+    {"name": "Pulse", "family": "Edged", "color": "#e0663a", "glyph": "pulse"},
+    {"name": "Ramp", "family": "Edged", "color": "#b23a72", "glyph": "ramp"},
+    {"name": "Saw", "family": "Toothed", "color": "#d08a1e", "glyph": "saw"},
+    {"name": "Reverse Saw", "family": "Toothed", "color": "#b5651d", "glyph": "reverse saw"},
+    {"name": "Noise", "family": "Toothed", "color": "#8d6e4a", "glyph": "noise"},
+    {"name": "Wavetable", "family": "Toothed", "color": "#b8961f", "glyph": "wavetable"}
+  ],
+  "cards": {
+    "A": [
+      {"value": 70, "need": 1, "damage": 6, "count": 3},
+      {"value": 55, "need": 1, "damage": 10, "count": 1},
+      {"value": 80, "need": 2, "damage": 8, "count": 2},
+      {"value": 90, "need": 3, "damage": 9, "count": 1}
+    ],
+    "S": [
+      {"value": 40, "need": 1, "count": 1},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "D": [
+      {"value": 40, "need": 1, "count": 3},
+      {"value": 60, "need": 1, "count": 1}
+    ],
+    "R": [
+      {"value": 55, "need": 1, "count": 1}
+    ]
+  }
+}
