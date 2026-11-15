@@ -42,4 +42,4 @@ LAN games use TCP port 47420: when macOS asks whether to accept incoming connect
 
 To remove it: delete the folder, `~/Applications/ADSR.app` and `~/.local/bin/adsr`.
 
-If something doesn't work, please write to zklaas@yahoo.ca.
+If something doesn't work, please write to zklaastest-testing@yahoo.com.

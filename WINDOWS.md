@@ -40,4 +40,4 @@ LAN games use TCP port 47420: when Windows Firewall asks, allow ADSR on private 
 To remove it: delete the folder, the Start-menu entry (ADSR) and
 `%LOCALAPPDATA%\Programs\ADSR`.
 
-If something doesn't work, please write to zklaas@yahoo.ca.
+If something doesn't work, please write to zklaastest-testing@yahoo.com.
