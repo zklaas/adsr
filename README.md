@@ -4,6 +4,14 @@ A card game of **Attack, Decay, Sustain and Release**, played against the
 computer, hot-seat on one screen, or over the LAN. PyQt6; otherwise
 standard library only.
 
+## Play online
+
+**[Play ADSR in your browser](https://zklaas.github.io/adsr/web/)**: nothing to install,
+on a computer, tablet or phone (against the computer, or several people sharing one
+device; LAN games need the desktop version). The first visit loads about 10 MB; after
+that it starts quickly. It plays by exactly the same rules and computer players as the
+desktop version, which it runs in the browser (`web/`).
+
 ## Download
 
 Ready-to-run downloads (executable programs), with nothing else to install:

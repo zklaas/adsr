@@ -1,0 +1,45 @@
+{
+ "decks": [
+  {
+   "name": "Captains (1x)",
+   "file": "deck.json",
+   "max_players": 6
+  },
+  {
+   "name": "Balance of Power (3x)",
+   "file": "decks/balance-of-power-3x.json",
+   "max_players": 6
+  },
+  {
+   "name": "Hatfields and McCoys (3x)",
+   "file": "decks/hatfields-mccoys-3x.json",
+   "max_players": 6
+  },
+  {
+   "name": "Infielders (2x sustains, 1x attacks)",
+   "file": "decks/infielders.json",
+   "max_players": 6
+  },
+  {
+   "name": "Romeo and Juliet (2x)",
+   "file": "decks/romeo-juliet-2x.json",
+   "max_players": 6
+  },
+  {
+   "name": "Rock Paper Scissors Lizard Alien (3x)",
+   "file": "decks/rpsla-3x.json",
+   "max_players": 6
+  },
+  {
+   "name": "Sound waves (3x)",
+   "file": "decks/sound-3x.json",
+   "max_players": 6
+  }
+ ],
+ "python": [
+  "app/__init__.py",
+  "app/cards.py",
+  "app/engine.py",
+  "app/ai.py"
+ ]
+}

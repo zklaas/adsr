@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b3a55">
+<title>ADSR</title>
+<link rel="icon" type="image/png" href="../icons/adsr-64.png">
+<link rel="apple-touch-icon" href="../icons/adsr-256.png">
+<link rel="stylesheet" href="adsr.css">
+</head>
+<body>
+<header class="bar">
+  <span class="brand"><img src="../icons/adsr-64.png" alt=""> ADSR</span>
+  <span id="status" class="status"></span>
+  <span class="bar-buttons">
+    <button id="btn-rules" type="button">Rules</button>
+    <button id="btn-log" type="button" hidden>Log</button>
+    <button id="btn-new" type="button" hidden>New game</button>
+  </span>
+</header>
+
+<main>
+  <section id="loading" class="panel">
+    <h1>ADSR</h1>
+    <p>A card game of <b>Attack, Decay, Sustain and Release</b>.</p>
+    <p id="loading-text">Loading the game… (the first time takes a little while)</p>
+    <div class="spinner" aria-hidden="true"></div>
+  </section>
+
+  <section id="setup" class="panel" hidden>
+    <h1>New game</h1>
+    <label class="field">Deck
+      <select id="deck"></select>
+    </label>
+    <p id="deck-note" class="note"></p>
+    <h2>Players</h2>
+    <div id="seats"></div>
+    <div class="row">
+      <button id="add-seat" type="button">Add a player</button>
+    </div>
+    <p class="note">Several people can share this device: give each one a seat as a
+      person, and pass it round when told.</p>
+    <div class="row">
+      <button id="start" type="button" class="primary">Start game</button>
+    </div>
+    <p id="setup-error" class="error"></p>
+  </section>
+
+  <section id="game" hidden>
+    <div id="players" class="players"></div>
+    <div id="table" class="table"></div>
+    <div class="controls">
+      <p id="prompt" class="prompt"></p>
+      <p id="hint" class="hint"></p>
+      <div class="row">
+        <button id="primary" type="button" class="primary"></button>
+        <button id="swap" type="button" hidden></button>
+        <button id="secondary" type="button"></button>
+      </div>
+    </div>
+    <div id="hand" class="hand"></div>
+  </section>
+</main>
+
+<aside id="log-panel" class="drawer" hidden>
+  <div class="drawer-head"><b>Game log</b> <button type="button" data-close="log-panel">Close</button></div>
+  <ol id="log" class="log"></ol>
+</aside>
+
+<aside id="rules-panel" class="drawer wide" hidden>
+  <div class="drawer-head"><b>Rules</b> <button type="button" data-close="rules-panel">Close</button></div>
+  <div id="rules" class="rules">Loading…</div>
+</aside>
+
+<div id="pass" class="cover" hidden>
+  <div class="panel">
+    <p id="pass-text"></p>
+    <button id="pass-ok" type="button" class="primary">I'm ready</button>
+  </div>
+</div>
+
+<footer class="foot">
+  ADSR — <a href="https://github.com/zklaas/adsr">source and downloads</a>.
+  Runs entirely in your browser.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"></script>
+<script src="adsr.js"></script>
+</body>
+</html>
