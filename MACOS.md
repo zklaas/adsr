@@ -1,23 +1,45 @@
 # ADSR on macOS
 
-The same code runs on macOS, Windows and Linux. ADSR needs **Python 3.10 or newer**
-(macOS's own `python3` is too old):
+The same code runs on macOS, Windows and Linux.
 
-    brew install python@3.13        # Homebrew: https://brew.sh
-    # or the installer from https://www.python.org/downloads/macos/
+## Where to type the commands
 
-Then, in Terminal:
+Everything below is typed into **Terminal**: open Applications > Utilities >
+Terminal, or press ⌘-Space, type *Terminal* and press Return. Press Return after
+each line.
+
+## 1. Install Python
+
+ADSR needs **Python 3.10 or newer** (the `python3` that comes with macOS is
+too old). The simplest way is the installer from
+https://www.python.org/downloads/macos/ ; or, with Homebrew (https://brew.sh):
+
+    brew install python@3.13
+
+## 2. Get ADSR
+
+**With git:**
 
     git clone https://github.com/zklaas/adsr.git ADSR
     cd ADSR
+
+(The first time, macOS offers to install its command-line tools for `git`: accept,
+then run the line again.)
+
+**Without git:** on https://github.com/zklaas/adsr click **Code > Download ZIP**;
+the Mac unpacks it into your Downloads folder (`adsr-main`). In Terminal type
+`cd ` (with a space), drag that folder onto the Terminal window, and press Return.
+
+## 3. Install it
+
     bash install-macos.sh
 
 That creates `.venv` (PyQt6), a `adsr` command in `~/.local/bin`, and a
-**ADSR** app in your Applications folder (Launchpad, Spotlight, the Dock).
+**ADSR** app in your Applications folder: start it from Launchpad, Spotlight or
+the Dock from then on.
 
 LAN games use TCP port 47420: when macOS asks whether to accept incoming connections, allow it.
 
 To remove it: delete the folder, `~/Applications/ADSR.app` and `~/.local/bin/adsr`.
 
-macOS support has not yet been tested on a Mac; please report anything that does
-not work.
+If something doesn't work, please write to zklaas@yahoo.ca.
