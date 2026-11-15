@@ -54,8 +54,9 @@ async function boot() {
     const files = [...manifest.python, ...manifest.decks.map((d) => d.file), "web/bridge.py"];
     for (const f of files) {
       const r = await fetch("../" + f);
-      if (!r.ok) throw new Error(`could not load ${f}`);
       const dest = f === "web/bridge.py" ? "/adsr/bridge.py" : "/adsr/" + f;
+      if (!r.ok && f.endsWith("__init__.py")) { fs.writeFile(dest, ""); continue; }   // empty anyway
+      if (!r.ok) throw new Error(`could not load ${f}`);
       fs.writeFile(dest, await r.text());
     }
     py.runPython("import sys, os; sys.path.insert(0, '/adsr'); os.chdir('/adsr')");
