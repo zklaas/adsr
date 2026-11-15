@@ -5,7 +5,9 @@ of decks.  Run after adding a deck or changing an emblem:
 
     python3 web/make_web.py
 
-Writes web/glyphs.json and web/manifest.json.  Needs PyQt6 (desktop only).
+Writes web/glyphs.json and web/manifest.json, and stamps index.html's links
+with content versions.  Needs PyQt6 (desktop only).  Run it before publishing
+any change to the web files.
 """
 import json
 import os
@@ -66,7 +68,23 @@ def main():
         json.dump({"decks": decks,
                    "python": ["app/__init__.py", "app/cards.py", "app/engine.py", "app/ai.py"]},
                   f, indent=1)
+    stamp_versions()
     print(f"{len(glyphs)} emblems, {len(decks)} decks")
+
+
+def stamp_versions():
+    """Give index.html's links to adsr.css and adsr.js a ?v=<content hash>, so a
+    changed file has a new address and browsers fetch it at once instead of
+    using a cached copy (GitHub Pages lets browsers keep files for 10 minutes)."""
+    import hashlib
+    import re
+    page = os.path.join(HERE, "index.html")
+    html = open(page, encoding="utf-8").read()
+    for name in ("adsr.css", "adsr.js"):
+        with open(os.path.join(HERE, name), "rb") as f:
+            v = hashlib.sha1(f.read()).hexdigest()[:10]
+        html = re.sub(re.escape(name) + r'(\?v=[0-9a-f]+)?"', f'{name}?v={v}"', html)
+    open(page, "w", encoding="utf-8").write(html)
 
 
 if __name__ == "__main__":
