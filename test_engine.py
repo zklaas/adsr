@@ -93,7 +93,7 @@ class DeckTests(unittest.TestCase):
         self.assertEqual(max(c.need for c in cards), 1)          # single Attacks only
 
     def test_infielders_deck(self):
-        cfg = load_config(dict(bundled_decks())["Infielders (putouts and assists)"])
+        cfg = load_config(dict(bundled_decks())["Infielders (2x sustains, 1x attacks)"])
         self.assertEqual(len(cfg.kinds), 35)
         self.assertEqual(len({k.family for k in cfg.kinds}), 5)
         cards = build_deck(cfg)

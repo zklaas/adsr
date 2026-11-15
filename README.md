@@ -295,3 +295,10 @@ full refills); findings below that mention Waveforms refer to it.
 
 With the 3x deck, a 3-player Easy/Normal/Hard game lasts about 89
 turns and is won by Hard about 73%, Normal 22% and Easy 5% of the time.
+
+## Windows and macOS
+
+The same code runs on Windows and macOS. To install it there:
+
+* **Windows:** see [WINDOWS.md](WINDOWS.md) (`install.ps1`).
+* **macOS:** see [MACOS.md](MACOS.md) (`install-macos.sh`).
