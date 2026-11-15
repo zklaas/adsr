@@ -4,6 +4,18 @@ A card game of **Attack, Decay, Sustain and Release**, played against the
 computer, hot-seat on one screen, or over the LAN. PyQt6; otherwise
 standard library only.
 
+## Download
+
+Ready-to-run downloads (executable programs), with nothing else to install:
+
+* **Windows:** [ADSR-Setup-Windows.exe](https://github.com/zklaas/adsr/releases/latest/download/ADSR-Setup-Windows.exe)
+* **macOS** (Apple silicon): [ADSR-macOS.dmg](https://github.com/zklaas/adsr/releases/latest/download/ADSR-macOS.dmg)
+* **Linux:** [ADSR-Linux-x86_64.AppImage](https://github.com/zklaas/adsr/releases/latest/download/ADSR-Linux-x86_64.AppImage)
+
+The first time, Windows or macOS asks before opening it; the
+[release page](https://github.com/zklaas/adsr/releases/latest) says what to click.
+To install from the source code at the command line instead, see below.
+
 ```
 ./install.sh            # puts `adsr` on your PATH and adds a dash entry
 adsr                    # open the table
