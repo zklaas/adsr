@@ -154,11 +154,25 @@ class _Normal(_Base):
         cfg = self.g.cfg
         return bool(cfg.draw_limit) and len(self.me.hand) + cfg.draw_limit <= cfg.hand_size
 
+    LEADER_GAP = 20      # HP ahead of everyone else that makes someone "clearly leading"
+    LEADER_SHARE = 0.5   # how often Normal then attacks that leader instead of the weakest
+
     def turn(self):
+        """Attack the weakest opponent, except that someone who has pulled clearly
+        ahead gets attacked half the time.  Always ganging up on the weakest made
+        Normal lose to Easy (sim, Captains deck, 2 Easy + 2 Normal, 800 games:
+        Easy 28.8% vs Normal 21.2% per seat); with the leader rule Normal wins
+        26.9% vs 23.1%, 1 Easy + 1 Normal + 1 Hard is unchanged (6/20/74%) and
+        games run about 6% longer (2026-11-15)."""
         sets = self.sets("A")
         if sets:
             best = self.best(sets, lambda s: (self.value(s) * self.damage(s), -len(s)))
-            tgt = min(self.g.opponents(self.pid), key=lambda p: (p.hp, self.rng.random()))
+            opps = self.g.opponents(self.pid)
+            tgt = min(opps, key=lambda p: (p.hp, self.rng.random()))
+            lead = max(opps, key=lambda p: (p.hp, self.rng.random()))
+            rest = [p.hp for p in opps if p.id != lead.id] + [self.me.hp]
+            if lead.hp - max(rest) >= self.LEADER_GAP and self.rng.random() < self.LEADER_SHARE:
+                tgt = lead
             return {"type": "attack", "cards": list(best), "target": tgt.id}
         if self.rationed():
             return {"type": "discard", "cards": []}     # pass: keep every card

@@ -24,14 +24,18 @@ APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ICON = os.path.join(APP_DIR, "icons", "adsr.png")
 RULES = os.path.join(APP_DIR, "RULES.md")
 
-FELT = "#1e4a35"
-FELT_DARK = "#153527"
-FELT_LINE = "#2f6a4d"
-INK = "#f1efe6"
-MUTED = "#a9c2b4"
-GOLD = "#f2c14e"
-HIT = "#ff8a7a"
-SAFE = "#9fe0a8"
+# The web version's light theme (web/adsr.css), shared so both look alike.
+FELT = "#efe9dc"          # page
+FELT_DARK = "#fbf8f0"     # panels
+FELT_LINE = "#d7cfbd"     # borders
+TABLE_BG = "#e6dfcf"      # the table, where the Attack is shown
+INK = "#26241f"
+MUTED = "#6b665c"
+ACCENT = "#2b3a55"
+GOLD = "#f2c14e"          # a selected card's border
+HIT = "#a8322a"
+SAFE = "#2e7d32"
+FADED = "#a39c8d"
 CARD_FACE = "#fbf8f0"
 SPEEDS = {"Fast": 250, "Normal": 750, "Slow": 1600}
 LEVEL_NAMES = {"easy": "Easy", "normal": "Normal", "hard": "Hard"}
@@ -505,73 +509,179 @@ def clear_layout(lay: QtWidgets.QLayout) -> None:
 
 # ------------------------------------------------------------------- widgets
 class PlayerBox(QtWidgets.QFrame):
+    """One player: name, HP bar, cards.  Click it to choose whom to attack."""
+    clicked = QtCore.pyqtSignal(int)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("playerBox")
-        self.setMinimumWidth(170)
+        self.setMinimumWidth(150)
+        self.pid = -1
+        self.choosable = False
         lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(10, 8, 10, 8)
+        lay.setContentsMargins(10, 7, 10, 7)
         lay.setSpacing(3)
+        top = QtWidgets.QHBoxLayout()
         self.name = QtWidgets.QLabel()
+        self.name.setTextFormat(Qt.TextFormat.RichText)
         self.name.setStyleSheet("font-weight: bold; font-size: 15px;")
-        self.role = QtWidgets.QLabel()
-        self.role.setStyleSheet(f"color: {MUTED};")
+        self.hp_text = QtWidgets.QLabel()
+        self.hp_text.setStyleSheet("font-weight: bold;")
+        top.addWidget(self.name, 1)
+        top.addWidget(self.hp_text)
         self.hp = QtWidgets.QProgressBar()
-        self.hp.setTextVisible(True)
-        self.hp.setFixedHeight(18)
+        self.hp.setTextVisible(False)
+        self.hp.setFixedHeight(7)
         self.info = QtWidgets.QLabel()
-        for w in (self.name, self.role, self.hp, self.info):
-            lay.addWidget(w)
+        self.info.setStyleSheet(f"color: {MUTED}; font-size: 12px;")
+        lay.addLayout(top)
+        lay.addWidget(self.hp)
+        lay.addWidget(self.info)
 
-    def show_player(self, pl: dict, label: str, current: bool, pending: bool, you: bool):
-        self.name.setText(pl["name"] + ("  (you)" if you else ""))
-        self.role.setText(label)
+    def mousePressEvent(self, e):
+        if self.choosable and e.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit(self.pid)
+
+    def show_player(self, pl: dict, label: str, current: bool, pending: bool, you: bool,
+                    target: bool = False, choosable: bool = False, chosen: bool = False):
+        self.pid, self.choosable = pl["id"], choosable
+        tag = (f" <span style='background:{ACCENT}; color:white; font-size:11px;'>&nbsp;your hand&nbsp;</span>"
+               if you else "")
+        self.name.setText(pl["name"] + tag)
+        self.hp_text.setText(f"{max(0, pl['hp'])} HP" if pl["alive"] else "out")
         self.hp.setMaximum(pl["max_hp"])
         self.hp.setValue(max(0, pl["hp"]))
-        self.hp.setFormat(f"{pl['hp']} / {pl['max_hp']} HP")
         frac = pl["hp"] / max(1, pl["max_hp"])
-        chunk = "#4fb36b" if frac > 0.5 else "#d9a63a" if frac > 0.25 else "#d2533f"
+        chunk = SAFE if frac > 0.3 else HIT
         self.hp.setStyleSheet(
-            f"QProgressBar {{ background: {FELT_DARK}; border: 1px solid {FELT_LINE};"
-            f" border-radius: 4px; color: {INK}; text-align: center; }}"
+            f"QProgressBar {{ background: #e3dccd; border: none; border-radius: 3px; }}"
             f"QProgressBar::chunk {{ background: {chunk}; border-radius: 3px; }}")
-        if not pl["alive"]:
-            self.info.setText("Out")
-        else:
-            state = "  ·  attacking" if current else ""
-            if pending and not current:
-                state = "  ·  to respond"
-            elif pending and current:
+        state = ""
+        if pl["alive"]:
+            if pending and current:
                 state = "  ·  to play"
-            self.info.setText(f"{pl['hand_count']} cards{state}")
-        border = GOLD if pending else (INK if current else FELT_LINE)
+            elif pending:
+                state = "  ·  to respond"
+            elif current:
+                state = "  ·  attacking"
+        self.info.setText((f"{label}  ·  " if label else "") + f"{pl['hand_count']} cards{state}"
+                          if pl["alive"] else (label or "Out"))
+        border, style, bg = FELT_LINE, "solid", FELT_DARK
+        if pending or current:
+            border = ACCENT
+        if target:
+            border = HIT
+        if choosable:
+            style = "dashed"
+        if chosen:
+            border, style, bg = HIT, "solid", "#fdeeec"
+        self.setCursor(Qt.CursorShape.PointingHandCursor if choosable else Qt.CursorShape.ArrowCursor)
+        self.setToolTip(f"Attack {pl['name']}" if choosable else "")
         self.setStyleSheet(
-            f"#playerBox {{ background: {FELT_DARK}; border: 2px solid {border};"
-            f" border-radius: 8px; }}"
-            + ("#playerBox QLabel { color: #6f8a7c; }" if not pl["alive"] else ""))
+            f"#playerBox {{ background: {bg}; border: 2px {style} {border}; border-radius: 10px; }}"
+            + (f"#playerBox QLabel {{ color: {FADED}; }}" if not pl["alive"] else ""))
 
 
-class ExchangeView(QtWidgets.QWidget):
+class FlowLayout(QtWidgets.QLayout):
+    """Lays widgets out in rows, wrapping to the next row when one is full (the hand)."""
+
+    def __init__(self, parent=None, spacing=8):
+        super().__init__(parent)
+        self.items: list = []
+        self.setSpacing(spacing)
+
+    def addItem(self, item):
+        self.items.append(item)
+
+    def count(self):
+        return len(self.items)
+
+    def itemAt(self, i):
+        return self.items[i] if 0 <= i < len(self.items) else None
+
+    def takeAt(self, i):
+        return self.items.pop(i) if 0 <= i < len(self.items) else None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        return self._place(QtCore.QRect(0, 0, width, 0), apply=False)
+
+    def setGeometry(self, rect):
+        super().setGeometry(rect)
+        self._place(rect, apply=True)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        size = QtCore.QSize()
+        for it in self.items:
+            size = size.expandedTo(it.minimumSize())
+        m = self.contentsMargins()
+        return size + QtCore.QSize(m.left() + m.right(), m.top() + m.bottom())
+
+    def _place(self, rect, apply: bool) -> int:
+        m = self.contentsMargins()
+        area = rect.adjusted(m.left(), m.top(), -m.right(), -m.bottom())
+        rows, row, row_w = [], [], 0
+        for it in self.items:
+            w = it.sizeHint().width()
+            if row and row_w + self.spacing() + w > area.width():
+                rows.append(row)
+                row, row_w = [], 0
+            row_w += (self.spacing() if row else 0) + w
+            row.append(it)
+        if row:
+            rows.append(row)
+        y = area.y()
+        for row in rows:
+            widths = [it.sizeHint().width() for it in row]
+            total = sum(widths) + self.spacing() * (len(row) - 1)
+            x = area.x() + max(0, (area.width() - total) // 2)      # centred, as on the web
+            h = max(it.sizeHint().height() for it in row)
+            for it, w in zip(row, widths):
+                if apply:
+                    it.setGeometry(QtCore.QRect(x, y, w, it.sizeHint().height()))
+                x += w + self.spacing()
+            y += h + self.spacing()
+        return y - rect.y() - (self.spacing() if rows else 0) + m.bottom()
+
+
+class ExchangeView(QtWidgets.QFrame):
+    """The table: the Attack under way (or the last one), as on the web version."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("tableArea")
         self.lay = QtWidgets.QVBoxLayout(self)
-        self.lay.setContentsMargins(12, 10, 12, 10)
-        self.lay.setSpacing(6)
+        self.lay.setContentsMargins(12, 8, 12, 10)
+        self.lay.setSpacing(4)
 
-    def _row(self, title: str, cards: list, kinds: list, detail: str):
+    def _group(self, cards: list, kinds: list, caption: str) -> QtWidgets.QWidget:
+        box = QtWidgets.QWidget()
+        v = QtWidgets.QVBoxLayout(box)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(2)
         row = QtWidgets.QHBoxLayout()
-        lab = QtWidgets.QLabel(title)
-        lab.setFixedWidth(180)
-        lab.setWordWrap(True)
-        row.addWidget(lab)
+        row.setSpacing(3)
+        row.addStretch(1)
         for c in cards:
             row.addWidget(CardWidget(c, kinds, small=True))
-        det = QtWidgets.QLabel(detail)
-        det.setStyleSheet("font-size: 14px;")
-        row.addSpacing(8)
-        row.addWidget(det)
         row.addStretch(1)
-        self.lay.addLayout(row)
+        v.addLayout(row)
+        lab = QtWidgets.QLabel(caption)
+        lab.setTextFormat(Qt.TextFormat.RichText)
+        lab.setWordWrap(True)
+        lab.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        lab.setMaximumWidth(190)
+        lab.setStyleSheet(f"color: {MUTED}; font-size: 12px;")
+        v.addWidget(lab, 0, Qt.AlignmentFlag.AlignHCenter)
+        return box
 
     def show_view(self, v: dict):
         clear_layout(self.lay)
@@ -579,36 +689,42 @@ class ExchangeView(QtWidgets.QWidget):
         kinds = v["deck"]["kinds"]
         names = [p["name"] for p in v["players"]]
         if not ex:
-            lab = QtWidgets.QLabel("No Attack yet this game.")
-            lab.setStyleSheet(f"color: {MUTED}; font-size: 15px;")
+            lab = QtWidgets.QLabel(f"No Attack yet.  {v['draw_count']} cards in the draw pile.")
+            lab.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lab.setStyleSheet(f"color: {MUTED}; font-size: 15px; padding: 26px;")
             self.lay.addWidget(lab)
-            self.lay.addStretch(1)
             return
         live = v["exchange"] is not None
         kname = kinds[ex["kind"]]["name"]
         if has_families(kinds):
-            kname += f" <span style='color:{MUTED}'>({kinds[ex['kind']]['family']})</span>"
-        head = QtWidgets.QLabel(
-            f"{'' if live else 'Last exchange · '}Turn {ex['turn_no']}: "
-            f"<b>{names[ex['attacker']]}</b> attacks <b>{names[ex['target']]}</b> "
-            f"<span style='color:{kinds[ex['kind']]['color']}'>■</span> {kname}")
-        head.setStyleSheet("font-size: 16px;")
+            kname += f" ({kinds[ex['kind']]['family']})"
+        head = QtWidgets.QLabel(f"{'Now' if live else 'Last Attack'} · Turn {ex['turn_no']}: "
+                                f"<span style='color:{kinds[ex['kind']]['color']}'>■</span> {kname}")
+        head.setTextFormat(Qt.TextFormat.RichText)
+        head.setStyleSheet(f"color: {MUTED}; font-size: 13px;")
         self.lay.addWidget(head)
-        self._row(f"{names[ex['attacker']]}<br><span style='color:{MUTED}'>Attack</span>",
-                  ex["cards"], kinds, f"{ex['value']}%  ·  {ex['damage']} damage")
+        row = QtWidgets.QHBoxLayout()
+        row.setSpacing(12)
+        row.addWidget(self._group(ex["cards"], kinds,
+                                  f"<b style='color:{INK}'>{names[ex['attacker']]}</b> attacks "
+                                  f"<b style='color:{INK}'>{names[ex['target']]}</b> · {ex['value']}% · "
+                                  f"{ex['damage']} dmg"), 0, Qt.AlignmentFlag.AlignBottom)
         role_txt = {"target": "defends", "bystander": "joins in", "attacker": "sustains"}
         for pl in ex["plays"]:
-            if pl["type"] == "R":
-                det = f"{pl['value']}% to release the Attack"
-            else:
-                sign = "+" if pl["type"] == "S" else "−"
-                det = f"{pl['value']}%  →  {sign}{pl['shift']} to the Attack"
-            self._row(f"{names[pl['player']]}<br><span style='color:{MUTED}'>"
-                      f"{role_txt[pl['role']]} · {TYPE_NAMES[pl['type']]}</span>",
-                      pl["cards"], kinds, det)
-        pct = QtWidgets.QLabel(f"Chance to hit: <b>{ex['percent']}%</b>")
-        pct.setStyleSheet("font-size: 17px;")
-        self.lay.addWidget(pct)
+            sign = (f"+{pl['shift']}" if pl["type"] == "S" else f"−{pl['shift']}"
+                    if pl["type"] == "D" else f"{pl['value']}% roll")
+            row.addWidget(self._group(pl["cards"], kinds,
+                                      f"<b style='color:{INK}'>{names[pl['player']]}</b> "
+                                      f"{role_txt[pl['role']]}: {TYPE_NAMES[pl['type']]} {sign}"),
+                          0, Qt.AlignmentFlag.AlignBottom)
+        row.addStretch(1)
+        odds = QtWidgets.QLabel(f"<div style='font-size:30px; font-weight:800; color:{INK}'>"
+                                f"{ex['percent']}%</div><div style='color:{MUTED}; font-size:12px'>"
+                                f"{'to hit' if live else 'was the chance'}</div>")
+        odds.setTextFormat(Qt.TextFormat.RichText)
+        odds.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
+        row.addWidget(odds, 0, Qt.AlignmentFlag.AlignBottom)
+        self.lay.addLayout(row)
         res = ex["result"]
         if res:
             lines = []
@@ -624,22 +740,24 @@ class ExchangeView(QtWidgets.QWidget):
                 out = (f"<span style='color:{HIT}'><b>{names[ex['target']]} loses "
                        f"{total} HP</b></span>")
                 for x in res["extras"]:
-                    out += f"<br>{names[x['player']]}'s Sustain added {x['amount']}"
+                    out += f" · {names[x['player']]}'s Sustain added {x['amount']}"
             else:
                 out = f"<span style='color:{SAFE}'><b>{names[ex['target']]} is unharmed</b></span>"
                 for x in res["heals"]:
-                    out += f"<br>{names[x['player']]} heals {x['amount']} for their Decay"
+                    out += f" · {names[x['player']]} heals {x['amount']} for their Decay"
             if res["eliminated"]:
-                out += f"<br><span style='color:{HIT}'><b>{names[ex['target']]} is out!</b></span>"
-            lab = QtWidgets.QLabel("<br>".join(lines + [out]))
-            lab.setStyleSheet("font-size: 15px;")
+                out += f" · <span style='color:{HIT}'><b>{names[ex['target']]} is out!</b></span>"
+            lab = QtWidgets.QLabel(" · ".join(lines) + ("<br>" if lines else "") + out)
+            lab.setTextFormat(Qt.TextFormat.RichText)
+            lab.setWordWrap(True)
+            lab.setStyleSheet("font-size: 14px;")
             self.lay.addWidget(lab)
-        self.lay.addStretch(1)
 
 
 class TableWidget(QtWidgets.QWidget):
     action = QtCore.pyqtSignal(dict)
     newGame = QtCore.pyqtSignal()
+    rulesRequested = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -648,77 +766,110 @@ class TableWidget(QtWidgets.QWidget):
         self._key = None
         self._log_text = None
 
-        outer = QtWidgets.QVBoxLayout(self)
-        outer.setContentsMargins(12, 10, 12, 10)
-        outer.setSpacing(8)
+        self.target_id: int | None = None      # whom to attack: click a player box
+
+        # Laid out like the web version: header, players, table, prompt and buttons,
+        # then the hand wrapping into rows.  The log slides out on the right.
+        root = QtWidgets.QHBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+        main = QtWidgets.QWidget()
+        outer = QtWidgets.QVBoxLayout(main)
+        outer.setContentsMargins(14, 10, 14, 10)
+        outer.setSpacing(10)
+        root.addWidget(main, 1)
+
+        head = QtWidgets.QHBoxLayout()
+        self.status_lab = QtWidgets.QLabel()
+        self.status_lab.setStyleSheet(f"color: {MUTED}; font-size: 14px;")
+        head.addWidget(self.status_lab, 1)
+        self.rules_btn = QtWidgets.QPushButton("Rules")
+        self.log_btn = QtWidgets.QPushButton("Log")
+        self.log_btn.setCheckable(True)
+        self.new_btn = QtWidgets.QPushButton("New game")
+        for b in (self.rules_btn, self.log_btn, self.new_btn):
+            head.addWidget(b)
+        outer.addLayout(head)
 
         self.players_row = QtWidgets.QHBoxLayout()
-        self.players_row.setSpacing(10)
+        self.players_row.setSpacing(8)
         outer.addLayout(self.players_row)
         self.boxes: list[PlayerBox] = []
 
-        split = QtWidgets.QSplitter(Qt.Orientation.Horizontal)
         self.exch = ExchangeView()
-        sc = QtWidgets.QScrollArea()
-        sc.setWidget(self.exch)
-        sc.setWidgetResizable(True)
-        sc.setObjectName("exchScroll")
-        split.addWidget(sc)
-        self.log = QtWidgets.QPlainTextEdit()
-        self.log.setReadOnly(True)
-        self.log.setObjectName("log")
-        split.addWidget(self.log)
-        split.setStretchFactor(0, 3)
-        split.setStretchFactor(1, 2)
-        split.setSizes([700, 420])
-        outer.addWidget(split, 1)
+        self.exch.setMinimumHeight(120)
+        # The cards being played on the left, the explanation and buttons on the right,
+        # side by side, so the hand below gets the height.
+        middle = QtWidgets.QHBoxLayout()
+        middle.setSpacing(10)
+        middle.addWidget(self.exch, 3)
 
+        panel = QtWidgets.QFrame()
+        panel.setObjectName("panel")
+        pl = QtWidgets.QVBoxLayout(panel)
+        pl.setContentsMargins(12, 10, 12, 10)
+        pl.setSpacing(4)
         self.prompt = QtWidgets.QLabel()
         self.prompt.setWordWrap(True)
         self.prompt.setTextFormat(Qt.TextFormat.RichText)
         self.prompt.setStyleSheet("font-size: 15px;")
-        outer.addWidget(self.prompt)
-
+        pl.addWidget(self.prompt)
+        self.hint = QtWidgets.QLabel()
+        self.hint.setStyleSheet(f"color: {MUTED}; font-size: 13px;")
+        pl.addWidget(self.hint)
+        pl.addStretch(1)
         ctl = QtWidgets.QHBoxLayout()
-        self.target_lab = QtWidgets.QLabel("Target:")
-        self.target = QtWidgets.QComboBox()
-        self.target.setMinimumWidth(150)
         self.primary = QtWidgets.QPushButton()
         self.secondary = QtWidgets.QPushButton()
         self.swap = QtWidgets.QPushButton()
         self.swap.setToolTip("Trade dimmed cards (ones you can't play this turn) for new "
                              "ones from the draw pile. Your turn goes on.")
-        for b in (self.primary, self.secondary, self.swap):
-            b.setMinimumHeight(32)
-            b.setMinimumWidth(150)
+        for b in (self.primary, self.swap, self.secondary):
+            b.setMinimumHeight(36)
+            b.setMinimumWidth(110)
+            ctl.addWidget(b)
         self.primary.setObjectName("primary")
-        self.hint = QtWidgets.QLabel()
-        self.hint.setStyleSheet(f"color: {MUTED};")
-        self.pile = QtWidgets.QLabel()
-        self.pile.setStyleSheet(f"color: {MUTED};")
-        for w in (self.target_lab, self.target, self.primary, self.secondary, self.swap,
-                  self.hint):
-            ctl.addWidget(w)
         ctl.addStretch(1)
-        ctl.addWidget(self.pile)
-        outer.addLayout(ctl)
+        pl.addLayout(ctl)
+        self.pile = QtWidgets.QLabel()
+        self.pile.setStyleSheet(f"color: {MUTED}; font-size: 12px;")
+        pl.addWidget(self.pile)
+        panel.setMinimumWidth(360)
+        middle.addWidget(panel, 2)
+        outer.addLayout(middle)
 
         self.hand_host = QtWidgets.QWidget()
-        self.hand_lay = QtWidgets.QHBoxLayout(self.hand_host)
-        self.hand_lay.setContentsMargins(4, 0, 4, 4)
-        self.hand_lay.setSpacing(8)
+        self.hand_lay = FlowLayout(self.hand_host, spacing=8)
+        self.hand_lay.setContentsMargins(4, 10, 4, 4)
         hs = self.hand_scroll = QtWidgets.QScrollArea()
         hs.setWidget(self.hand_host)
         hs.setWidgetResizable(True)
-        hs.setFixedHeight(182)
+        hs.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         hs.setObjectName("handScroll")
-        outer.addWidget(hs)
+        hs.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        outer.addWidget(hs, 1)
+
+        self.log_panel = QtWidgets.QFrame()
+        self.log_panel.setObjectName("panel")
+        self.log_panel.setFixedWidth(380)
+        lp = QtWidgets.QVBoxLayout(self.log_panel)
+        lp.setContentsMargins(10, 8, 10, 10)
+        lab = QtWidgets.QLabel("<b>Game log</b>")
+        lp.addWidget(lab)
+        self.log = QtWidgets.QPlainTextEdit()
+        self.log.setReadOnly(True)
+        self.log.setObjectName("log")
+        lp.addWidget(self.log, 1)
+        self.log_panel.setVisible(False)
+        root.addWidget(self.log_panel)
+        self.log_btn.toggled.connect(self.log_panel.setVisible)
+        self.new_btn.clicked.connect(self.newGame.emit)
+        self.rules_btn.clicked.connect(self.rulesRequested.emit)
 
         self.primary.clicked.connect(self._primary)
         self.secondary.clicked.connect(self._secondary)
         self.swap.clicked.connect(lambda: self.action.emit(
             {"type": "swap", "cards": sorted(self.selected)}))
-        self.target.currentIndexChanged.connect(lambda _i: self._controls())
 
     # ---------------------------------------------------------------- state
     def mine(self) -> bool:
@@ -765,6 +916,7 @@ class TableWidget(QtWidgets.QWidget):
             self.log.setPlainText(text)
             self.log.verticalScrollBar().setValue(self.log.verticalScrollBar().maximum())
         self.pile.setText(f"Draw pile {v['draw_count']}  ·  discards {v['discard_count']}")
+        self.status_lab.setText(f"{v['deck']['name']}  ·  Turn {v['turn_no']}")
         self._hand()
         self._controls()
 
@@ -772,12 +924,29 @@ class TableWidget(QtWidgets.QWidget):
         v = self.view
         while len(self.boxes) < len(v["players"]):
             b = PlayerBox()
+            b.clicked.connect(self._choose_target)
             self.boxes.append(b)
             self.players_row.addWidget(b)
+        for b in self.boxes[len(v["players"]):]:
+            b.setVisible(False)
         labels = v.get("labels") or [""] * len(v["players"])
+        choosing = self.mine() and v["phase"] == TURN
+        alive = [p["id"] for p in v["players"] if p["alive"] and p["id"] != v["you"]]
+        if choosing and self.target_id not in alive:
+            self.target_id = alive[0] if len(alive) == 1 else None
+        ex = v["exchange"]
         for b, pl in zip(self.boxes, v["players"]):
+            b.setVisible(True)
+            can = choosing and pl["id"] in alive
             b.show_player(pl, labels[pl["id"]], pl["id"] == v["current"] and v["phase"] != OVER,
-                          pl["id"] == v["pending"], pl["id"] == v["you"])
+                          pl["id"] == v["pending"], pl["id"] == v["you"],
+                          target=bool(ex) and pl["id"] == ex["target"], choosable=can,
+                          chosen=can and pl["id"] == self.target_id)
+
+    def _choose_target(self, pid: int):
+        self.target_id = pid
+        self._players()
+        self._controls()
 
     def _hand(self):
         clear_layout(self.hand_lay)
@@ -789,7 +958,7 @@ class TableWidget(QtWidgets.QWidget):
             lab = QtWidgets.QLabel("Hand hidden." if v["you"] is None else "No cards in hand.")
             lab.setStyleSheet(f"color: {MUTED};")
             self.hand_lay.addWidget(lab)
-        width = self._card_width(len(v["hand"]))
+        width = 100                       # full-size cards, wrapping into rows as on the web
         for c in v["hand"]:
             dim = self.mine() and c["id"] not in usable
             w = CardWidget(c, kinds, selected=c["id"] in self.selected, dim=dim, width=width)
@@ -797,20 +966,6 @@ class TableWidget(QtWidgets.QWidget):
                 w.clicked.connect(self._toggle)
                 w.doubleClicked.connect(self._autoset)
             self.hand_lay.addWidget(w)
-        self.hand_lay.addStretch(1)
-
-    def _card_width(self, n: int) -> int:
-        """Shrink the cards so a whole hand fits across without scrolling."""
-        if n == 0:
-            return 108
-        avail = self.hand_scroll.viewport().width() - 12
-        spacing = self.hand_lay.spacing()
-        return max(72, min(108, (avail - spacing * (n - 1)) // n))
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        if self.view and self.view["hand"]:
-            QtCore.QTimer.singleShot(0, self._hand)
 
     def _toggle(self, cid: int):
         self.selected ^= {cid}
@@ -840,9 +995,6 @@ class TableWidget(QtWidgets.QWidget):
             return
         names = [p["name"] for p in v["players"]]
         mine = self.mine()
-        show_target = mine and v["phase"] == TURN
-        self.target_lab.setVisible(show_target)
-        self.target.setVisible(show_target)
         self.primary.setVisible(True)
         self.secondary.setVisible(mine)
         self.swap.setVisible(False)
@@ -878,27 +1030,20 @@ class TableWidget(QtWidgets.QWidget):
         if v["phase"] == TURN:
             self.prompt.setText(
                 "<b>Your turn.</b> Select an Attack set — same Kind, and exactly as many "
-                "cards as the largest ×N among them — choose a target and Attack. "
+                "cards as the largest ×N among them — click the player to attack, then Attack. "
                 f"Or discard up to {v['deck']['rules']['max_discard']} cards (none = pass). "
                 "Double-click a card to pick its best set."
                 + (f" First you may <b>swap</b> up to {v['swap']} dimmed card"
                    f"{'s' * (v['swap'] > 1)} for new ones." if v.get("swap") else ""))
-            cur = self.target.currentData()
-            self.target.blockSignals(True)
-            self.target.clear()
-            for p in v["players"]:
-                if p["alive"] and p["id"] != v["you"]:
-                    self.target.addItem(f"{p['name']} ({p['hp']} HP)", p["id"])
-            i = self.target.findData(cur)
-            self.target.setCurrentIndex(max(0, i))
-            self.target.blockSignals(False)
             ok = n > 0 and self._is_set(self.selected, "A")
-            self.primary.setText("Attack")
-            self.primary.setEnabled(ok and self.target.count() > 0)
+            tgt = self.target_id
+            self.primary.setText(f"Attack {names[tgt]}" if tgt is not None else "Attack")
+            self.primary.setEnabled(ok and tgt is not None)
             if ok:
                 hand = self.hand()
                 val = round(sum(hand[i]["value"] for i in self.selected) / n + 1e-9)
-                self.hint.setText(f"{val}% to hit · {sum(hand[i]['damage'] for i in self.selected)} damage")
+                self.hint.setText(f"{val}% to hit · {sum(hand[i]['damage'] for i in self.selected)} damage"
+                                  + (" · now click a player to attack" if tgt is None else ""))
             elif n and "A" in parts and len(parts) == 1:
                 self.hint.setText("Not a complete Attack set yet.")
             md = v["deck"]["rules"]["max_discard"]
@@ -968,7 +1113,7 @@ class TableWidget(QtWidgets.QWidget):
             return
         ids = sorted(self.selected)
         if v["phase"] == TURN:
-            self.action.emit({"type": "attack", "cards": ids, "target": self.target.currentData()})
+            self.action.emit({"type": "attack", "cards": ids, "target": self.target_id})
         elif v["phase"] == DEFEND:
             self.action.emit({"type": "respond", "cards": ids})
         elif v["phase"] == ASSIST:
@@ -1478,25 +1623,25 @@ class SetupDialog(QtWidgets.QDialog):
 TABLE_STYLE = f"""
             QStackedWidget, QStackedWidget > QWidget {{ background: {FELT}; }}
             QLabel {{ color: {INK}; }}
-            QScrollArea#exchScroll, QScrollArea#handScroll {{ background: {FELT_DARK};
-                border: 1px solid {FELT_LINE}; border-radius: 8px; }}
-            QScrollArea#exchScroll > QWidget > QWidget,
-            QScrollArea#handScroll > QWidget > QWidget {{ background: {FELT_DARK}; }}
+            QScrollArea#handScroll {{ background: transparent; border: none; }}
+            QScrollArea#handScroll > QWidget > QWidget {{ background: {FELT}; }}
             QPlainTextEdit#log {{ background: {FELT_DARK}; color: {INK};
                 border: 1px solid {FELT_LINE}; border-radius: 8px;
                 font-family: monospace; font-size: 12px; padding: 4px; }}
-            QPushButton {{ background: #2c5f46; color: {INK}; border: 1px solid {FELT_LINE};
-                border-radius: 6px; padding: 4px 14px; font-size: 14px; }}
-            QPushButton:hover {{ background: #357153; }}
-            QPushButton:disabled {{ color: #6f8a7c; background: #23503b; }}
-            QPushButton#primary {{ background: {GOLD}; color: #2a2414; font-weight: bold;
-                border: 1px solid #c99a2e; }}
-            QPushButton#primary:hover {{ background: #f6cf6e; }}
-            QPushButton#primary:disabled {{ background: #6d6a4c; color: #3b3a2c; }}
+            QPushButton {{ background: {FELT_DARK}; color: {INK}; border: 1px solid {FELT_LINE};
+                border-radius: 8px; padding: 6px 14px; font-size: 14px; }}
+            QPushButton:hover {{ background: #f3eee2; }}
+            QPushButton:disabled {{ color: {FADED}; background: #f3efe6; }}
+            QPushButton#primary {{ background: {ACCENT}; color: white; font-weight: bold;
+                border: 1px solid {ACCENT}; }}
+            QPushButton#primary:hover {{ background: #3a4c6e; }}
+            QPushButton#primary:disabled {{ background: #9aa3b5; color: #eef0f4; border-color: #9aa3b5; }}
+            QFrame#panel {{ background: {FELT_DARK}; border: 1px solid {FELT_LINE}; border-radius: 12px; }}
+            QFrame#tableArea {{ background: {TABLE_BG}; border: none; border-radius: 12px; }}
             QComboBox {{ background: {FELT_DARK}; color: {INK}; border: 1px solid {FELT_LINE};
                 border-radius: 4px; padding: 3px 8px; min-height: 24px; }}
             QComboBox QAbstractItemView {{ background: {FELT_DARK}; color: {INK};
-                selection-background-color: #357153; }}
+                selection-background-color: {TABLE_BG}; selection-color: {INK}; }}
             QListWidget {{ background: {FELT_DARK}; color: {INK}; border: 1px solid {FELT_LINE};
                 border-radius: 6px; font-size: 14px; padding: 4px; }}
 """
@@ -1508,8 +1653,8 @@ DIALOG_STYLE = TABLE_STYLE.replace("QStackedWidget, QStackedWidget > QWidget", "
             QGroupBox QLabel, QRadioButton {{ color: {INK}; font-weight: normal; }}
             QLineEdit, QSpinBox {{ background: {FELT_DARK}; color: {INK};
                 border: 1px solid {FELT_LINE}; border-radius: 4px; padding: 3px 6px; }}
-            QLineEdit:disabled {{ color: #6f8a7c; }}
-            QToolButton {{ background: #2c5f46; color: {INK}; border: 1px solid {FELT_LINE};
+            QLineEdit:disabled {{ color: {FADED}; }}
+            QToolButton {{ background: {FELT_DARK}; color: {INK}; border: 1px solid {FELT_LINE};
                 border-radius: 4px; padding: 2px 6px; }}
             QScrollBar:vertical {{ background: {FELT_DARK}; width: 10px; border-radius: 5px; }}
             QScrollBar::handle:vertical {{ background: {FELT_LINE}; min-height: 24px;
@@ -1546,6 +1691,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.table = TableWidget()
         self.table.action.connect(self._table_action)
         self.table.newGame.connect(self.new_game)
+        self.table.rulesRequested.connect(self.show_rules)
         self._add_page("welcome", self._welcome_page())
         self._add_page("table", self.table)
         self._add_page("curtain", self._curtain_page())
@@ -1573,7 +1719,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _welcome_page(self):
         title = QtWidgets.QLabel("ADSR")
-        title.setStyleSheet(f"font-size: 64px; font-weight: bold; color: {GOLD}; letter-spacing: 8px;")
+        title.setStyleSheet(f"font-size: 64px; font-weight: bold; color: {ACCENT}; letter-spacing: 8px;")
         sub = QtWidgets.QLabel("Attack · Decay · Sustain · Release")
         sub.setStyleSheet(f"font-size: 18px; color: {MUTED};")
         cards = QtWidgets.QWidget()
@@ -1708,9 +1854,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Scoped to the stack (not the window) so message boxes and the rules
         # dialog keep normal colours.
         self.menuBar().setStyleSheet(
-            f"QMenuBar {{ background: {FELT_DARK}; color: {INK}; }}"
-            f"QMenuBar::item:selected {{ background: #357153; }}")
-        self.statusBar().setStyleSheet(f"QStatusBar {{ background: {FELT_DARK}; color: {GOLD}; }}")
+            f"QMenuBar {{ background: {ACCENT}; color: white; }}"
+            f"QMenuBar::item:selected {{ background: #3a4c6e; }}")
+        self.statusBar().setStyleSheet(f"QStatusBar {{ background: {FELT_DARK}; color: {ACCENT}; }}")
         self.stack.setStyleSheet(TABLE_STYLE)
 
     # ----------------------------------------------------------- flow

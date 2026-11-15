@@ -478,5 +478,38 @@ class AITests(unittest.TestCase):
         self.assertGreater(wins, 45)
 
 
+
+class NormalTargets(unittest.TestCase):
+    def test_clear_leader_is_attacked_sometimes(self):
+        """Normal attacks the weakest, but a clear leader (20+ HP ahead) about half the time."""
+        import random
+        from app import ai
+        cfg = load_config(DEFAULT_DECK)
+        on_leader = attacks = 0
+        for seed in range(400):
+            g = Game(cfg, ["Me", "Lead", "Weak"], seed=seed, first=0)
+            g.players[1].hp, g.players[2].hp, g.players[0].hp = 100, 40, 60
+            rng = random.Random(seed)
+            act = ai.choose(g, 0, "normal", rng)
+            while act["type"] == "swap":           # swaps come first; the turn goes on
+                g.apply(0, act)
+                act = ai.choose(g, 0, "normal", rng)
+            if act["type"] == "attack":
+                attacks += 1
+                on_leader += act["target"] == 1
+        self.assertGreater(attacks, 300)
+        self.assertTrue(0.35 < on_leader / attacks < 0.65, on_leader / attacks)
+
+        # nobody clearly ahead: always the weakest
+        g = Game(cfg, ["Me", "A", "B"], seed=1, first=0)
+        g.players[1].hp, g.players[2].hp = 90, 80
+        rng = random.Random(1)
+        act = ai.choose(g, 0, "normal", rng)
+        while act["type"] == "swap":
+            g.apply(0, act)
+            act = ai.choose(g, 0, "normal", rng)
+        if act["type"] == "attack":
+            self.assertEqual(act["target"], 2)
+
 if __name__ == "__main__":
     unittest.main()
